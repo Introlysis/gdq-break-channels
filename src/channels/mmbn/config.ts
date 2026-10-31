@@ -1,6 +1,5 @@
 import bgGif from './assets/backgrounds/bg.gif';
 import bgGif2 from './assets/backgrounds/bg2.gif';
-import bgGif3 from './assets/backgrounds/bg3.gif';
 import type { BgScrollDirection, BattleChipDef, BackgroundDef, BossDef, DialogSet, Speaker, SpriteTilePosition } from './types';
 
 
@@ -52,9 +51,8 @@ const MMBN_CONSTS = {
 		'down-right': [0.70710678, 0.70710678],
 	} as Record<BgScrollDirection, [number, number]>,
 	BACKGROUNDS: [
-		{ name: 'bg', src: bgGif, direction: 'up-left', tileSize: 1536 },
-		{ name: 'bg2', src: bgGif2, direction: 'up-right', tileSize: 1536 },
-		{ name: 'bg3', src: bgGif3, direction: 'up-left', tileSize: 1536 },
+		{ name: 'bg', src: bgGif, direction: 'up-right', tileSize: 1536 },
+		{ name: 'bg2', src: bgGif2, direction: 'up-left', tileSize: 1536 },
 	] as BackgroundDef[],
 
 	//2x scale - looks nice, and is an integer scale

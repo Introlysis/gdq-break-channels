@@ -1367,7 +1367,7 @@ function mmbn(props: ChannelProps) {
 				$<TweenNumber value={Math.floor(shownTotal)} />
 			</TotalEl>
 			<SideBoxLeft>
-				<SideBoxText>Benefitting {event.beneficiary}<br></br><br></br>Latest Donation:<br></br>${lastDonation}</SideBoxText>
+				<SideBoxText>Latest Donation (thank you!!):<br></br>${lastDonation}</SideBoxText>
 			</SideBoxLeft>
 			{dialogText && (
 				<DialogBox>
@@ -1397,13 +1397,14 @@ const Canvas = styled.canvas`
 
 const TotalEl = styled.div`
 	font-family: gdqpixel;
-	font-size: 46px;
+	font-size: 54px;
 	color: white;
 
 	position: absolute;
 
 	left: 32px;
-	top: 32px;
+	top: 26px;
+	background: rgba(0, 0, 0, 0.6);
 	filter: drop-shadow(0 4px 0 black);
 `;
 
@@ -1432,19 +1433,20 @@ const DialogText = styled.div`
 const SideBoxLeft = styled.div`
 	position: absolute;
 	left: 16px;
-	top: 50%;
-	transform: translateY(-35%);
+	top: calc(50% - 20px);
+	transform: none;
 
 	box-sizing: border-box;
 	width: 270px;
+	height: 150px;
 	padding: 8px;
 	background: rgba(0, 0, 0, 0.6);
 	border: 2px solid #ffffff;
 `;
 
 const SideBoxText = styled.div`
-	font-family: gdqpixel;
-	font-size: 14px;
+	font-family: bn6boss;
+	font-size: 26px;
 	color: #ffffff;
 	line-height: 1.5;
 	white-space: pre-wrap;
