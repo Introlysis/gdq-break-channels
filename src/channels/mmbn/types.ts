@@ -9,15 +9,7 @@ export type SpriteTilePosition =
 	| 'bottom-left'
 	| 'bottom-right';
 
-export type BgScrollDirection =
-	| 'up'
-	| 'down'
-	| 'left'
-	| 'right'
-	| 'up-left'
-	| 'up-right'
-	| 'down-left'
-	| 'down-right';
+export type BgScrollDirection = 'up' | 'down' | 'left' | 'right' | 'up-left' | 'up-right' | 'down-left' | 'down-right';
 
 export type Speaker =
 	| 'lan'

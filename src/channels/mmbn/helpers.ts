@@ -29,11 +29,7 @@ export function useTypewriter(text: string, msPerChar: number) {
 	};
 }
 
-function findAdjacentTile(
-	current: SpriteTilePosition,
-	dx: number,
-	dy: number,
-): SpriteTilePosition | null {
+function findAdjacentTile(current: SpriteTilePosition, dx: number, dy: number): SpriteTilePosition | null {
 	const [cx, cy] = MMBN_CONSTS.MM_EXE_TILE_POSITION[current];
 	const target = (Object.entries(MMBN_CONSTS.MM_EXE_TILE_POSITION) as [SpriteTilePosition, [number, number]][]).find(
 		([, [x, y]]) => x === cx + dx && y === cy + dy,
@@ -41,11 +37,7 @@ function findAdjacentTile(
 	return target ? target[0] : null;
 }
 
-export function bossTileAtOffset(
-	current: SpriteTilePosition,
-	dx: number,
-	dy: number,
-): SpriteTilePosition | null {
+export function bossTileAtOffset(current: SpriteTilePosition, dx: number, dy: number): SpriteTilePosition | null {
 	const [cx, cy] = MMBN_CONSTS.BOSS_TILE_POSITION[current];
 	const target = (Object.entries(MMBN_CONSTS.BOSS_TILE_POSITION) as [SpriteTilePosition, [number, number]][]).find(
 		([, [x, y]]) => x === cx + dx * MMBN_CONSTS.MM_EXE_TILE_DX && y === cy + dy * MMBN_CONSTS.MM_EXE_TILE_DY,
@@ -104,11 +96,7 @@ export function shuffle<T>(items: T[]): T[] {
 	return result;
 }
 
-export function bossInChipZone(
-	chip: BattleChipDef,
-	mmTile: SpriteTilePosition,
-	bossTile: SpriteTilePosition,
-): boolean {
+export function bossInChipZone(chip: BattleChipDef, mmTile: SpriteTilePosition, bossTile: SpriteTilePosition): boolean {
 	const mmRow = tileRow(mmTile);
 	const mmCol = tileCol(mmTile);
 	const [bossX, bossY] = MMBN_CONSTS.BOSS_TILE_POSITION[bossTile];

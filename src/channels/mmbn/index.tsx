@@ -1,13 +1,6 @@
-import type { Event, FormattedDonation, Total } from '@gdq/types/tracker';
+import type { FormattedDonation, Total } from '@gdq/types/tracker';
 import { ChannelProps, registerChannel } from '../channels';
-import {
-	BattleChipDef,
-	BackgroundDef,
-	BossDef,
-	DialogSet,
-	Speaker,
-	SpriteTilePosition,
-} from './types';
+import { BattleChipDef, BackgroundDef, BossDef, DialogSet, Speaker, SpriteTilePosition } from './types';
 import {
 	adjacentTiles,
 	bossInChipZone,
@@ -37,13 +30,13 @@ import battleGrid from './assets/battle-grid.png';
 import { usePreloadedReplicant } from '@gdq/lib/hooks/usePreloadedReplicant';
 
 /**************************************************
- * 
- * MegaMan Battle Network channel - basically a 
+ *
+ * MegaMan Battle Network channel - basically a
  * boss battle a la MMBN3. Megaman moves on his own.
  * Donations give him battlechips. Every so often
  * a supporting character will jump in and say a line
- * or two. 
- * 
+ * or two.
+ *
  ************************************************/
 
 registerChannel('MMBN', 300, mmbn, {
@@ -53,7 +46,6 @@ registerChannel('MMBN', 300, mmbn, {
 });
 
 function mmbn(props: ChannelProps) {
-	const [event] = usePreloadedReplicant<Event>('currentEvent');
 	const [shownTotal, setShownTotal] = useState<number>(
 		usePreloadedReplicant<Total | null>('total', null)[0]?.raw ?? 0,
 	);
@@ -95,7 +87,10 @@ function mmbn(props: ChannelProps) {
 
 	const [dialogText, setDialogText] = useState('');
 	const [speaker, setSpeaker] = useState<Speaker>('lan');
-	const { typed: typedDialog, done: dialogDone } = useTypewriter(dialogText, MMBN_CONSTS.DIALOG_TYPEWRITER_MS_PER_CHAR);
+	const { typed: typedDialog, done: dialogDone } = useTypewriter(
+		dialogText,
+		MMBN_CONSTS.DIALOG_TYPEWRITER_MS_PER_CHAR,
+	);
 	const dialogQueue = useRef<DialogSet[]>(
 		[MMBN_CONSTS.DIALOG_SETS[0], ...shuffle(MMBN_CONSTS.DIALOG_SETS.slice(1))].map((set) => [...set]),
 	);
@@ -125,7 +120,7 @@ function mmbn(props: ChannelProps) {
 		if (!container) return;
 		const n = st.segment;
 		container.children[n].visible = true;
-		st.segment++;
+		st.segment += 1;
 		st.lastReveal = performance.now();
 	};
 
@@ -168,7 +163,6 @@ function mmbn(props: ChannelProps) {
 		const [exe_x, exe_y] = MMBN_CONSTS.MM_EXE_TILE_POSITION[mm_exe_position.current];
 		const [boss_x, boss_y] = MMBN_CONSTS.BOSS_TILE_POSITION[boss_position.current];
 
-		const megaMan = objects.current.megaMan as PIXI.AnimatedSprite;
 		const idleFrame = spritesheet.current!.animations.mm_exe_idle[0];
 		const idleW = idleFrame.width * MMBN_CONSTS.SPRITE_SCALE;
 		const idleH = idleFrame.height * MMBN_CONSTS.SPRITE_SCALE;
@@ -176,8 +170,8 @@ function mmbn(props: ChannelProps) {
 		busterCharge.y = exe_y - idleH / 2;
 
 		//battlechip fan position
-		const headX = exe_x + idleW /2;
-		const headY = exe_y - idleH - 25
+		const headX = exe_x + idleW / 2;
+		const headY = exe_y - idleH - 25;
 		for (let i = 0; i < chipSprites.current.length; i++) {
 			const spr = chipSprites.current[i];
 			if (!spr.visible) continue;
@@ -208,7 +202,7 @@ function mmbn(props: ChannelProps) {
 		const currentTile = boss_position.current;
 		const otherTiles = tiles.filter((t) => t !== currentTile);
 
-		//if the next chip is shortRange, we try to get the boss to 
+		//if the next chip is shortRange, we try to get the boss to
 		//walk to the front row
 		const frontChip = chipQueue.current[0];
 		const favorFrontCol = frontChip?.shortRange === true;
@@ -246,13 +240,16 @@ function mmbn(props: ChannelProps) {
 
 		let completed = 0;
 		const onGhostDone = () => {
-			completed++;
+			completed += 1;
 			if (completed < 2) return;
 			ghostFrom.visible = false;
 			ghostTo.visible = false;
 			bossMoving.current = false;
 			if (bossDying.current) return;
-			bossMoveTimeout.current = window.setTimeout(moveBoss, MMBN_CONSTS.BOSS_MOVE_BASE_DELAY_MS + Math.random() * MMBN_CONSTS.BOSS_MOVE_JITTER_MS);
+			bossMoveTimeout.current = window.setTimeout(
+				moveBoss,
+				MMBN_CONSTS.BOSS_MOVE_BASE_DELAY_MS + Math.random() * MMBN_CONSTS.BOSS_MOVE_JITTER_MS,
+			);
 		};
 		ghostFrom.onComplete = onGhostDone;
 		ghostTo.onComplete = onGhostDone;
@@ -261,10 +258,7 @@ function mmbn(props: ChannelProps) {
 	const startCharge = (level: 1 | 2) => {
 		const busterCharge = objects.current?.busterCharge as PIXI.AnimatedSprite | undefined;
 		if (!busterCharge || busterCharge.destroyed || !spritesheet.current) return;
-		const anim =
-			spritesheet.current.animations[
-				level === 2 ? 'buster_charge_2' : 'buster_charge_1'
-			];
+		const anim = spritesheet.current.animations[level === 2 ? 'buster_charge_2' : 'buster_charge_1'];
 		const alpha = level === 2 ? 0.7 : 0.9;
 		busterCharge.alpha = alpha;
 		busterCharge.textures = anim;
@@ -341,7 +335,7 @@ function mmbn(props: ChannelProps) {
 			megaMan.x = cx;
 			megaMan.y = cy - megaMan.height;
 			megaMan.play();
-			megaMan.onComplete = null;
+			megaMan.onComplete = undefined;
 
 			resolveShot(isChargeShot);
 		};
@@ -362,9 +356,7 @@ function mmbn(props: ChannelProps) {
 		const damage = isChargeShot ? MMBN_CONSTS.MM_CHARGE_SHOT_DAMAGE : MMBN_CONSTS.MM_BASE_DAMAGE;
 		setBossHealth((health) => Math.max(0, Math.round(health - damage)));
 
-		busterImpact.textures = spritesheet.current.animations[
-			isChargeShot ? 'charged_impact' : 'mm_buster_impact'
-		];
+		busterImpact.textures = spritesheet.current.animations[isChargeShot ? 'charged_impact' : 'mm_buster_impact'];
 
 		const bossCenterX = boss.x;
 		const bossCenterY = boss.y - boss.height / 2;
@@ -385,7 +377,7 @@ function mmbn(props: ChannelProps) {
 		busterImpact.play();
 		busterImpact.onComplete = () => {
 			busterImpact.visible = false;
-			busterImpact.onComplete = null;
+			busterImpact.onComplete = undefined;
 		};
 	};
 
@@ -455,7 +447,7 @@ function mmbn(props: ChannelProps) {
 		if (busterImpact.destroyed) return;
 		const impactAnim = chip.impactAnimation;
 		if (impactAnim) {
-			busterImpact.textures = spritesheet.current.animations[chip.impactAnimation];
+			busterImpact.textures = spritesheet.current.animations[impactAnim];
 			busterImpact.anchor.set(0.5, 0.5);
 			if (chip.impactJitter) {
 				const boss = objects.current.boss as PIXI.AnimatedSprite;
@@ -473,9 +465,9 @@ function mmbn(props: ChannelProps) {
 			busterImpact.play();
 			busterImpact.onComplete = () => {
 				busterImpact.visible = false;
-				busterImpact.onComplete = null;
+				busterImpact.onComplete = undefined;
 			};
-		};
+		}
 	};
 
 	const playChipExplosion = (x: number, y: number, animName: string) => {
@@ -494,7 +486,7 @@ function mmbn(props: ChannelProps) {
 		spr.onComplete = () => {
 			if (spr.destroyed) return;
 			spr.visible = false;
-			spr.onComplete = null;
+			spr.onComplete = undefined;
 		};
 	};
 
@@ -514,9 +506,7 @@ function mmbn(props: ChannelProps) {
 		const animName = chip.projectileAnim!;
 		const anim =
 			spritesheet.current.animations[animName] ??
-			(spritesheet.current.textures[animName]
-				? [spritesheet.current.textures[animName]]
-				: undefined);
+			(spritesheet.current.textures[animName] ? [spritesheet.current.textures[animName]] : undefined);
 		if (!anim) return false;
 
 		const proj = new PIXI.AnimatedSprite(anim);
@@ -545,9 +535,10 @@ function mmbn(props: ChannelProps) {
 			const [refX, refY] = MMBN_CONSTS.BOSS_TILE_POSITION['top-left'];
 			const targetX = refX + (landCol - 3) * MMBN_CONSTS.MM_EXE_TILE_DX;
 			const targetY = refY + landRow * MMBN_CONSTS.MM_EXE_TILE_DY;
-			landingTile = (Object.entries(MMBN_CONSTS.BOSS_TILE_POSITION) as [SpriteTilePosition, [number, number]][]).find(
-				([, [x, y]]) => x === targetX && y === targetY,
-			)?.[0] ?? null;
+			landingTile =
+				(Object.entries(MMBN_CONSTS.BOSS_TILE_POSITION) as [SpriteTilePosition, [number, number]][]).find(
+					([, [x, y]]) => x === targetX && y === targetY,
+				)?.[0] ?? null;
 			if (landingTile) {
 				[endX, endY] = MMBN_CONSTS.BOSS_TILE_POSITION[landingTile];
 			} else {
@@ -629,7 +620,7 @@ function mmbn(props: ChannelProps) {
 
 		let completed = 0;
 		const onGhostDone = () => {
-			completed++;
+			completed += 1;
 			if (completed < 2) return;
 			ghostFrom.visible = false;
 			ghostTo.visible = false;
@@ -689,7 +680,7 @@ function mmbn(props: ChannelProps) {
 				secondary.scale.set(MMBN_CONSTS.SPRITE_SCALE);
 				const [sec_anchor_x, sec_anchor_y] = chip.secondaryAnimAnchor ?? [0.5, 1];
 				secondary.anchor.set(sec_anchor_x, sec_anchor_y);
-				const secAnimSpeed = chip.secondaryAnimSpeed ?? 1/2;
+				const secAnimSpeed = chip.secondaryAnimSpeed ?? 1 / 2;
 				secondary.animationSpeed = secAnimSpeed;
 				secondary.x = exe_x + sec_x * MMBN_CONSTS.SPRITE_SCALE + stepPxX;
 				secondary.y = exe_y + sec_y * MMBN_CONSTS.SPRITE_SCALE + stepPxY;
@@ -707,13 +698,13 @@ function mmbn(props: ChannelProps) {
 				playMmTeleport([cx + stepPxX, cy + stepPxY], [cx, cy]);
 			}
 			megaMan.textures = spritesheet.current!.animations.mm_exe_idle;
-			megaMan.animationSpeed = 1/2;
+			megaMan.animationSpeed = 1 / 2;
 			megaMan.loop = true;
 			megaMan.anchor.set(0, 0);
 			megaMan.x = cx;
 			megaMan.y = cy - megaMan.height;
 			megaMan.play();
-			megaMan.onComplete = null;
+			megaMan.onComplete = undefined;
 			chipUsing.current = false;
 			applyChipEffect(chip);
 		};
@@ -737,7 +728,7 @@ function mmbn(props: ChannelProps) {
 			}
 		}
 		if (chipRepeatLeft.current > 1) {
-			chipRepeatLeft.current--;
+			chipRepeatLeft.current -= 1;
 			window.clearTimeout(chipRepeatTimeout.current);
 			chipRepeatTimeout.current = window.setTimeout(() => {
 				if (chipRepeatLeft.current > 0 && !chipUsing.current && chipQueue.current.length > 0) {
@@ -839,7 +830,7 @@ function mmbn(props: ChannelProps) {
 				megaMan.animationSpeed = 1 / 2;
 				megaMan.loop = true;
 				megaMan.play();
-				megaMan.onComplete = null;
+				megaMan.onComplete = undefined;
 			};
 		};
 	};
@@ -873,18 +864,17 @@ function mmbn(props: ChannelProps) {
 
 		const battleGridSprite = new PIXI.Sprite(PIXI.Texture.from(battleGrid));
 		battleGridSprite.scale.set(MMBN_CONSTS.SPRITE_SCALE);
-		battleGridSprite.x = (MMBN_CONSTS.CANVAS_W - MMBN_CONSTS.BATTLE_GRID_W * 2) / 2 + MMBN_CONSTS.BATTLE_GRID_OFFSET_X;
-		battleGridSprite.y = (MMBN_CONSTS.CANVAS_H - MMBN_CONSTS.BATTLE_GRID_H * 2) / 2 + MMBN_CONSTS.BATTLE_GRID_OFFSET_Y;
+		battleGridSprite.x =
+			(MMBN_CONSTS.CANVAS_W - MMBN_CONSTS.BATTLE_GRID_W * 2) / 2 + MMBN_CONSTS.BATTLE_GRID_OFFSET_X;
+		battleGridSprite.y =
+			(MMBN_CONSTS.CANVAS_H - MMBN_CONSTS.BATTLE_GRID_H * 2) / 2 + MMBN_CONSTS.BATTLE_GRID_OFFSET_Y;
 		container.addChild(battleGridSprite);
 
 		spritesheet.current = new PIXI.Spritesheet(PIXI.BaseTexture.from(sheetTexture), sheetAtlas);
 		spritesheet.current.parse().then(async () => {
 			if (cancelled || !spritesheet.current) return;
 
-			await Promise.all([
-				document.fonts.load('700 28px bn6boss'),
-				document.fonts.load('100 26px bn6speaking'),
-			]);
+			await Promise.all([document.fonts.load('700 28px bn6boss'), document.fonts.load('100 26px bn6speaking')]);
 
 			objects.current = {
 				container,
@@ -935,7 +925,7 @@ function mmbn(props: ChannelProps) {
 			const [boss_x, boss_y] = MMBN_CONSTS.BOSS_TILE_POSITION[boss_position.current];
 
 			const megaMan = objects.current.megaMan as PIXI.AnimatedSprite;
-			megaMan.animationSpeed = 1/2;
+			megaMan.animationSpeed = 1 / 2;
 			megaMan.scale.set(MMBN_CONSTS.SPRITE_SCALE);
 			megaMan.play();
 			megaMan.x = exe_x;
@@ -962,7 +952,7 @@ function mmbn(props: ChannelProps) {
 			container.addChild(bossSprite);
 
 			const bossMoveGhostFrom = objects.current.bossMoveGhostFrom as PIXI.AnimatedSprite;
-			bossMoveGhostFrom.animationSpeed = 1/2;
+			bossMoveGhostFrom.animationSpeed = 1 / 2;
 			bossMoveGhostFrom.scale.set(MMBN_CONSTS.SPRITE_SCALE);
 			bossMoveGhostFrom.anchor.set(0.5, 1);
 			bossMoveGhostFrom.visible = false;
@@ -970,7 +960,7 @@ function mmbn(props: ChannelProps) {
 			container.addChild(bossMoveGhostFrom);
 
 			const bossMoveGhostTo = objects.current.bossMoveGhostTo as PIXI.AnimatedSprite;
-			bossMoveGhostTo.animationSpeed = 1/2;
+			bossMoveGhostTo.animationSpeed = 1 / 2;
 			bossMoveGhostTo.scale.set(MMBN_CONSTS.SPRITE_SCALE);
 			bossMoveGhostTo.anchor.set(0.5, 1);
 			bossMoveGhostTo.visible = false;
@@ -994,7 +984,7 @@ function mmbn(props: ChannelProps) {
 			container.addChild(mmMoveGhostTo);
 
 			const custom = objects.current.cust_gauge as PIXI.AnimatedSprite;
-			custom.animationSpeed = 1/12;
+			custom.animationSpeed = 1 / 12;
 			custom.scale.set(MMBN_CONSTS.SPRITE_SCALE);
 			custom.play();
 			custom.x = MMBN_CONSTS.CUSTOM_GAUGE_X;
@@ -1017,7 +1007,8 @@ function mmbn(props: ChannelProps) {
 				mmHealth.addChild(digit);
 			}
 			mmHealth.scale.set(MMBN_CONSTS.SPRITE_SCALE);
-			const mmHealthW = (MM_HEALTH.length * DIGIT_W + (MM_HEALTH.length - 1) * DIGIT_SPACING) * MMBN_CONSTS.SPRITE_SCALE;
+			const mmHealthW =
+				(MM_HEALTH.length * DIGIT_W + (MM_HEALTH.length - 1) * DIGIT_SPACING) * MMBN_CONSTS.SPRITE_SCALE;
 			mmHealth.x = MMBN_CONSTS.MM_HEALTH_X - mmHealthW - MMBN_CONSTS.MM_HEALTH_GAP;
 			mmHealth.y = MMBN_CONSTS.MM_HEALTH_Y;
 			container.addChild(mmHealth);
@@ -1061,7 +1052,7 @@ function mmbn(props: ChannelProps) {
 			container.addChild(busterImpact);
 
 			const deathBling = objects.current.deathBling as PIXI.AnimatedSprite;
-			deathBling.animationSpeed = 1/4;
+			deathBling.animationSpeed = 1 / 4;
 			deathBling.scale.set(MMBN_CONSTS.SPRITE_SCALE);
 			deathBling.anchor.set(0.5, 0.5);
 			deathBling.x = bossSprite.x;
@@ -1076,7 +1067,7 @@ function mmbn(props: ChannelProps) {
 				const explosion = new PIXI.AnimatedSprite(
 					spritesheet.current.animations[MMBN_CONSTS.BOSS_DEATH_EXPLOSION_ANIM],
 				);
-				explosion.animationSpeed = .75;
+				explosion.animationSpeed = 0.75;
 				explosion.scale.set(MMBN_CONSTS.SPRITE_SCALE);
 				explosion.anchor.set(0.5, 0.5);
 				explosion.loop = false;
@@ -1105,9 +1096,7 @@ function mmbn(props: ChannelProps) {
 			for (const { texture, dir, startOffset } of MMBN_CONSTS.LINE_DIRECTIONS) {
 				const lineContainer = new PIXI.Container();
 				for (let n = 0; n < MMBN_CONSTS.LINE_SEGMENTS; n++) {
-					const spr = new PIXI.Sprite(
-						spritesheet.current.animations[texture][n],
-					);
+					const spr = new PIXI.Sprite(spritesheet.current.animations[texture][n]);
 					const d = MMBN_CONSTS.LINE_CIRCLE_RADIUS + n * tileSize;
 					spr.x = dir[0] * d - startOffset[0] * tileSize;
 					spr.y = dir[1] * d - startOffset[1] * tileSize;
@@ -1119,7 +1108,10 @@ function mmbn(props: ChannelProps) {
 				lineContainers.current.push(lineContainer);
 			}
 
-			bossMoveTimeout.current = window.setTimeout(moveBoss, MMBN_CONSTS.BOSS_MOVE_BASE_DELAY_MS + Math.random() * MMBN_CONSTS.BOSS_MOVE_JITTER_MS);
+			bossMoveTimeout.current = window.setTimeout(
+				moveBoss,
+				MMBN_CONSTS.BOSS_MOVE_BASE_DELAY_MS + Math.random() * MMBN_CONSTS.BOSS_MOVE_JITTER_MS,
+			);
 			scheduleFire();
 			scheduleMove();
 
@@ -1173,7 +1165,7 @@ function mmbn(props: ChannelProps) {
 		bossSprite.anchor.set(boss.anchor[0], boss.anchor[1]);
 		bossSprite.animationSpeed = boss.animationSpeed;
 		bossSprite.loop = true;
-		bossSprite.onComplete = null;
+		bossSprite.onComplete = undefined;
 		bossSprite.play();
 		resetLines();
 		setBossHealth(boss.health);
@@ -1214,23 +1206,20 @@ function mmbn(props: ChannelProps) {
 			spr.onComplete = () => {
 				if (spr.destroyed) return;
 				spr.visible = false;
-				spr.onComplete = null;
+				spr.onComplete = undefined;
 			};
-
 		};
 
 		const duration = MMBN_CONSTS.BOSS_DEATH_DURATION_MS;
 		const count = MMBN_CONSTS.BOSS_DEATH_EXPLOSION_COUNT;
 		for (let i = 0; i < count; i++) {
-			deathTimeouts.current.push(
-				window.setTimeout(fireExplosion, (duration / count) * i),
-			);
+			deathTimeouts.current.push(window.setTimeout(fireExplosion, (duration / count) * i));
 		}
 
 		if (!deathBling || deathBling.destroyed || !spritesheet.current) return;
 		deathBling.visible = true;
-		deathBling.x = cx
-		deathBling.y = cy
+		deathBling.x = cx;
+		deathBling.y = cy;
 		deathBling.gotoAndPlay(0);
 
 		deathTimeouts.current.push(
@@ -1241,12 +1230,18 @@ function mmbn(props: ChannelProps) {
 				deathBling.visible = false;
 				bossDying.current = false;
 				setBoss((prev) => {
-					const pool = MMBN_CONSTS.BOSSES.length > 1 ? MMBN_CONSTS.BOSSES.filter((b) => b.name !== prev.name) : MMBN_CONSTS.BOSSES;
+					const pool =
+						MMBN_CONSTS.BOSSES.length > 1
+							? MMBN_CONSTS.BOSSES.filter((b) => b.name !== prev.name)
+							: MMBN_CONSTS.BOSSES;
 					const next = pool[Math.floor(Math.random() * pool.length)];
 					return { ...next };
 				});
 				window.clearTimeout(bossMoveTimeout.current);
-				bossMoveTimeout.current = window.setTimeout(moveBoss, MMBN_CONSTS.BOSS_MOVE_BASE_DELAY_MS + Math.random() * MMBN_CONSTS.BOSS_MOVE_JITTER_MS);
+				bossMoveTimeout.current = window.setTimeout(
+					moveBoss,
+					MMBN_CONSTS.BOSS_MOVE_BASE_DELAY_MS + Math.random() * MMBN_CONSTS.BOSS_MOVE_JITTER_MS,
+				);
 				deathTimeouts.current = [];
 			}, duration),
 		);
@@ -1367,7 +1362,9 @@ function mmbn(props: ChannelProps) {
 				$<TweenNumber value={Math.floor(shownTotal)} />
 			</TotalEl>
 			<SideBoxLeft>
-				<SideBoxText>Latest Donation (thank you!!):<br></br>${lastDonation}</SideBoxText>
+				<SideBoxText>
+					Latest Donation (thank you!!):<br></br>${lastDonation}
+				</SideBoxText>
 			</SideBoxLeft>
 			{dialogText && (
 				<DialogBox>
@@ -1451,3 +1448,5 @@ const SideBoxText = styled.div`
 	line-height: 1.5;
 	white-space: pre-wrap;
 `;
+
+export default mmbn;
